@@ -295,6 +295,127 @@
                         </label>
                     </div>
             </div>
+
+            <div class="config-section gui_box grey config-thermal-camera">
+                <div class="gui_box_titlebar">
+                    <div class="spacer_box_title" data-i18n="configurationThermalCamera"></div>
+                </div>
+                <div class="spacer_box">
+                    <div class="info-box" data-i18n="thermalCameraDisclaimer"></div>
+                    
+                    <div class="select">
+                        <select id="mztc_enabled" data-setting="mztc_enabled"></select>
+                        <label for="mztc_enabled">
+                            <span data-i18n="configurationThermalCameraEnabled"></span>
+                        </label>
+                    </div>
+
+                    <div class="select mztc_port_wrapper">
+                        <select id="mztc_port" data-setting="mztc_port"></select>
+                        <label for="mztc_port">
+                            <span data-i18n="configurationThermalCameraPort"></span>
+                        </label>
+                    </div>
+
+                    <div class="select mztc_baudrate_wrapper">
+                        <select id="mztc_baudrate" data-setting="mztc_baudrate"></select>
+                        <label for="mztc_baudrate">
+                            <span data-i18n="configurationThermalCameraBaudrate"></span>
+                        </label>
+                    </div>
+
+                    <div class="select mztc_mode_wrapper">
+                        <select id="mztc_mode" data-setting="mztc_mode"></select>
+                        <label for="mztc_mode">
+                            <span data-i18n="configurationThermalCameraMode"></span>
+                        </label>
+                    </div>
+
+                    <div class="number mztc_brightness_wrapper">
+                        <input type="number" min="0" max="100" id="mztc_brightness" data-setting="mztc_brightness" />
+                        <label for="mztc_brightness">
+                            <span data-i18n="configurationThermalCameraBrightness"></span>
+                        </label>
+                    </div>
+
+                    <div class="number mztc_contrast_wrapper">
+                        <input type="number" min="0" max="100" id="mztc_contrast" data-setting="mztc_contrast" />
+                        <label for="mztc_contrast">
+                            <span data-i18n="configurationThermalCameraContrast"></span>
+                        </label>
+                    </div>
+
+                    <div class="select mztc_palette_wrapper">
+                        <select id="mztc_palette_mode" data-setting="mztc_palette_mode"></select>
+                        <label for="mztc_palette_mode">
+                            <span data-i18n="configurationThermalCameraPalette"></span>
+                        </label>
+                    </div>
+
+                    <div class="select mztc_zoom_wrapper">
+                        <select id="mztc_zoom_level" data-setting="mztc_zoom_level"></select>
+                        <label for="mztc_zoom_level">
+                            <span data-i18n="configurationThermalCameraZoom"></span>
+                        </label>
+                    </div>
+
+                    <div class="select mztc_auto_shutter_wrapper">
+                        <select id="mztc_auto_shutter" data-setting="mztc_auto_shutter"></select>
+                        <label for="mztc_auto_shutter">
+                            <span data-i18n="configurationThermalCameraAutoShutter"></span>
+                        </label>
+                    </div>
+
+                    <div class="number mztc_ffc_interval_wrapper">
+                        <input type="number" min="1" max="60" id="mztc_ffc_interval" data-setting="mztc_ffc_interval" />
+                        <label for="mztc_ffc_interval">
+                            <span data-i18n="configurationThermalCameraFFCInterval"></span>
+                        </label>
+                    </div>
+
+                    <div class="select mztc_temperature_alerts_wrapper">
+                        <select id="mztc_temperature_alerts" data-setting="mztc_temperature_alerts"></select>
+                        <label for="mztc_temperature_alerts">
+                            <span data-i18n="configurationThermalCameraTemperatureAlerts"></span>
+                        </label>
+                    </div>
+
+                    <div class="number mztc_alert_high_temp_wrapper">
+                        <input type="number" step="0.1" min="-50" max="200" id="mztc_alert_high_temp" data-setting="mztc_alert_high_temp" />
+                        <label for="mztc_alert_high_temp">
+                            <span data-i18n="configurationThermalCameraAlertHighTemp"></span>
+                        </label>
+                    </div>
+
+                    <div class="number mztc_alert_low_temp_wrapper">
+                        <input type="number" step="0.1" min="-50" max="200" id="mztc_alert_low_temp" data-setting="mztc_alert_low_temp" />
+                        <label for="mztc_alert_low_temp">
+                            <span data-i18n="configurationThermalCameraAlertLowTemp"></span>
+                        </label>
+                    </div>
+
+                    <div class="select mztc_zoom_channel_wrapper">
+                        <select id="mztc_zoom_channel" data-setting="mztc_zoom_channel"></select>
+                        <label for="mztc_zoom_channel">
+                            <span data-i18n="configurationThermalCameraZoomChannel"></span>
+                        </label>
+                    </div>
+
+                    <div class="select mztc_palette_channel_wrapper">
+                        <select id="mztc_palette_channel" data-setting="mztc_palette_channel"></select>
+                        <label for="mztc_palette_channel">
+                            <span data-i18n="configurationThermalCameraPaletteChannel"></span>
+                        </label>
+                    </div>
+
+                    <div class="select mztc_ffc_channel_wrapper">
+                        <select id="mztc_ffc_channel" data-setting="mztc_ffc_channel"></select>
+                        <label for="mztc_ffc_channel">
+                            <span data-i18n="configurationThermalCameraFFCChannel"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="clear-both"></div>

@@ -234,6 +234,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('#battery_capacity_critical').val(isNaN(batCapWarnCrit) ? "" : batCapWarnCrit);
         $('#battery_capacity_unit').val(FC.MISC.battery_capacity_unit);
 
+        // Thermal Camera Configuration
+        initializeThermalCamera();
+
         let $i2cSpeed = $('#i2c_speed'),
             $i2cSpeedInfo = $('#i2c_speed-info');
 
@@ -304,3 +307,135 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 TABS.configuration.cleanup = function (callback) {
     if (callback) callback();
 };
+
+function initializeThermalCamera() {
+    // Thermal Camera Enabled/Disabled
+    var mztcEnabled = $('#mztc_enabled');
+    mztcEnabled.empty();
+    $('<option value="0">Disabled</option>').appendTo(mztcEnabled);
+    $('<option value="1">Enabled</option>').appendTo(mztcEnabled);
+    mztcEnabled.val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.enabled : 0);
+
+    // Serial Port
+    var mztcPort = $('#mztc_port');
+    mztcPort.empty();
+    $('<option value="0">None</option>').appendTo(mztcPort);
+    $('<option value="1">USART1</option>').appendTo(mztcPort);
+    $('<option value="2">USART2</option>').appendTo(mztcPort);
+    $('<option value="3">USART3</option>').appendTo(mztcPort);
+    $('<option value="6">USART6</option>').appendTo(mztcPort);
+    mztcPort.val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.port : 0);
+
+    // Baud Rate
+    var mztcBaudrate = $('#mztc_baudrate');
+    mztcBaudrate.empty();
+    $('<option value="9600">9600</option>').appendTo(mztcBaudrate);
+    $('<option value="19200">19200</option>').appendTo(mztcBaudrate);
+    $('<option value="38400">38400</option>').appendTo(mztcBaudrate);
+    $('<option value="57600">57600</option>').appendTo(mztcBaudrate);
+    $('<option value="115200">115200</option>').appendTo(mztcBaudrate);
+    $('<option value="230400">230400</option>').appendTo(mztcBaudrate);
+    mztcBaudrate.val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.baudrate : 115200);
+
+    // Operating Mode
+    var mztcMode = $('#mztc_mode');
+    mztcMode.empty();
+    $('<option value="0">Disabled</option>').appendTo(mztcMode);
+    $('<option value="1">Standby</option>').appendTo(mztcMode);
+    $('<option value="2">Continuous</option>').appendTo(mztcMode);
+    $('<option value="3">Triggered</option>').appendTo(mztcMode);
+    $('<option value="4">Alert</option>').appendTo(mztcMode);
+    $('<option value="5">Recording</option>').appendTo(mztcMode);
+    $('<option value="6">Calibration</option>').appendTo(mztcMode);
+    $('<option value="7">Surveillance</option>').appendTo(mztcMode);
+    mztcMode.val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.mode : 2);
+
+    // Brightness
+    $('#mztc_brightness').val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.brightness : 50);
+
+    // Contrast
+    $('#mztc_contrast').val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.contrast : 50);
+
+    // Color Palette
+    var mztcPalette = $('#mztc_palette_mode');
+    mztcPalette.empty();
+    $('<option value="0">White Hot</option>').appendTo(mztcPalette);
+    $('<option value="1">Black Hot</option>').appendTo(mztcPalette);
+    $('<option value="2">Fusion 1</option>').appendTo(mztcPalette);
+    $('<option value="3">Rainbow</option>').appendTo(mztcPalette);
+    $('<option value="4">Fusion 2</option>').appendTo(mztcPalette);
+    $('<option value="5">Iron Red 1</option>').appendTo(mztcPalette);
+    $('<option value="6">Iron Red 2</option>').appendTo(mztcPalette);
+    $('<option value="7">Sepia</option>').appendTo(mztcPalette);
+    $('<option value="8">Color 1</option>').appendTo(mztcPalette);
+    $('<option value="9">Color 2</option>').appendTo(mztcPalette);
+    $('<option value="10">Ice Fire</option>').appendTo(mztcPalette);
+    $('<option value="11">Rain</option>').appendTo(mztcPalette);
+    $('<option value="12">Green Hot</option>').appendTo(mztcPalette);
+    $('<option value="13">Red Hot</option>').appendTo(mztcPalette);
+    mztcPalette.val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.palette_mode : 0);
+
+    // Zoom Level
+    var mztcZoom = $('#mztc_zoom_level');
+    mztcZoom.empty();
+    $('<option value="0">1X</option>').appendTo(mztcZoom);
+    $('<option value="1">2X</option>').appendTo(mztcZoom);
+    $('<option value="2">4X</option>').appendTo(mztcZoom);
+    $('<option value="3">8X</option>').appendTo(mztcZoom);
+    mztcZoom.val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.zoom_level : 0);
+
+    // Auto Shutter
+    var mztcAutoShutter = $('#mztc_auto_shutter');
+    mztcAutoShutter.empty();
+    $('<option value="0">Temperature Only</option>').appendTo(mztcAutoShutter);
+    $('<option value="1">Time Only</option>').appendTo(mztcAutoShutter);
+    $('<option value="2">Time and Temperature</option>').appendTo(mztcAutoShutter);
+    mztcAutoShutter.val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.auto_shutter : 2);
+
+    // FFC Interval
+    $('#mztc_ffc_interval').val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.ffc_interval : 5);
+
+    // Temperature Alerts
+    var mztcTempAlerts = $('#mztc_temperature_alerts');
+    mztcTempAlerts.empty();
+    $('<option value="0">Disabled</option>').appendTo(mztcTempAlerts);
+    $('<option value="1">Enabled</option>').appendTo(mztcTempAlerts);
+    mztcTempAlerts.val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.temperature_alerts : 1);
+
+    // Alert Temperatures
+    $('#mztc_alert_high_temp').val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.alert_high_temp : 80.0);
+    $('#mztc_alert_low_temp').val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.alert_low_temp : -10.0);
+
+    // RC Channels
+    var mztcZoomChannel = $('#mztc_zoom_channel');
+    mztcZoomChannel.empty();
+    $('<option value="0">None</option>').appendTo(mztcZoomChannel);
+    for (let i = 1; i <= 6; i++) {
+        $('<option value="' + i + '">AUX' + i + '</option>').appendTo(mztcZoomChannel);
+    }
+    mztcZoomChannel.val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.zoom_channel : 0);
+
+    var mztcPaletteChannel = $('#mztc_palette_channel');
+    mztcPaletteChannel.empty();
+    $('<option value="0">None</option>').appendTo(mztcPaletteChannel);
+    for (let i = 1; i <= 6; i++) {
+        $('<option value="' + i + '">AUX' + i + '</option>').appendTo(mztcPaletteChannel);
+    }
+    mztcPaletteChannel.val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.palette_channel : 0);
+
+    var mztcFfcChannel = $('#mztc_ffc_channel');
+    mztcFfcChannel.empty();
+    $('<option value="0">None</option>').appendTo(mztcFfcChannel);
+    for (let i = 1; i <= 6; i++) {
+        $('<option value="' + i + '">AUX' + i + '</option>').appendTo(mztcFfcChannel);
+    }
+    mztcFfcChannel.val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.ffc_channel : 0);
+
+    // Show/hide thermal camera section based on feature support
+    var configThermalCamera = $('.config-thermal-camera');
+    if (FC.FEATURES && FC.FEATURES.MZTC) {
+        configThermalCamera.show();
+    } else {
+        configThermalCamera.hide();
+    }
+}

@@ -6178,5 +6178,89 @@
     },
    "search": {
         "message": "Search"
+    },
+    "configurationThermalCamera": {
+        "message": "MassZero Thermal Camera"
+    },
+    "thermalCameraDisclaimer": {
+        "message": "Configure thermal imaging settings for the MassZero Thermal Camera. Requires MZTC feature to be enabled."
+    },
+    "configurationThermalCameraEnabled": {
+        "message": "Enable Thermal Camera"
+    },
+    "configurationThermalCameraPort": {
+        "message": "Serial Port"
+    },
+    "configurationThermalCameraBaudrate": {
+        "message": "Baud Rate"
+    },
+    "configurationThermalCameraMode": {
+        "message": "Operating Mode"
+    },
+    "configurationThermalCameraBrightness": {
+        "message": "Brightness"
+    },
+    "configurationThermalCameraContrast": {
+        "message": "Contrast"
+    },
+    "configurationThermalCameraPalette": {
+        "message": "Color Palette"
+    },
+    "configurationThermalCameraZoom": {
+        "message": "Zoom Level"
+    },
+    "configurationThermalCameraAutoShutter": {
+        "message": "Auto Shutter Mode"
+    },
+    "configurationThermalCameraFFCInterval": {
+        "message": "FFC Interval (minutes)"
+    },
+    "configurationThermalCameraTemperatureAlerts": {
+        "message": "Temperature Alerts"
+    },
+    "configurationThermalCameraAlertHighTemp": {
+        "message": "High Temperature Alert (°C)"
+    },
+    "configurationThermalCameraAlertLowTemp": {
+        "message": "Low Temperature Alert (°C)"
+    },
+    "configurationThermalCameraZoomChannel": {
+        "message": "Zoom Channel"
+    },
+    "configurationThermalCameraPaletteChannel": {
+        "message": "Palette Channel"
+    },
+    "configurationThermalCameraFFCChannel": {
+        "message": "FFC Channel"
+    },
+    "osd_thermal_temperature": {
+        "message": "Thermal Temperature"
+    },
+    "osd_thermal_min_temp": {
+        "message": "Thermal Min Temperature"
+    },
+    "osd_thermal_max_temp": {
+        "message": "Thermal Max Temperature"
+    },
+    "osd_thermal_center_temp": {
+        "message": "Thermal Center Temperature"
+    },
+    "osd_thermal_hot_spot": {
+        "message": "Thermal Hot Spot"
+    },
+    "osd_thermal_cold_spot": {
+        "message": "Thermal Cold Spot"
+    },
+    "osd_thermal_camera_status": {
+        "message": "Thermal Camera Status"
+    },
+    "osd_thermal_camera_mode": {
+        "message": "Thermal Camera Mode"
+    },
+    "osd_thermal_camera_palette": {
+        "message": "Thermal Camera Palette"
+    },
+    "osd_thermal_camera_zoom": {
+        "message": "Thermal Camera Zoom"
     }
 }

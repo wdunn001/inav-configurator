@@ -1199,6 +1199,146 @@ OSD.constants = {
                     }
                 },
                 {
+                    name: 'THERMAL_TEMPERATURE',
+                    id: 200,
+                    min_version: '3.0.0',
+                    enabled: function() {
+                        return FC.FEATURES && FC.FEATURES.MZTC;
+                    },
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                                return 'TH: 90' + FONT.symbol(SYM.TEMP_F);
+                            default: // Metric
+                                return 'TH: 32' + FONT.symbol(SYM.TEMP_C);
+                        }
+                    }
+                },
+                {
+                    name: 'THERMAL_MIN_TEMP',
+                    id: 201,
+                    min_version: '3.0.0',
+                    enabled: function() {
+                        return FC.FEATURES && FC.FEATURES.MZTC;
+                    },
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                                return 'MIN: 45' + FONT.symbol(SYM.TEMP_F);
+                            default: // Metric
+                                return 'MIN: 7' + FONT.symbol(SYM.TEMP_C);
+                        }
+                    }
+                },
+                {
+                    name: 'THERMAL_MAX_TEMP',
+                    id: 202,
+                    min_version: '3.0.0',
+                    enabled: function() {
+                        return FC.FEATURES && FC.FEATURES.MZTC;
+                    },
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                                return 'MAX: 120' + FONT.symbol(SYM.TEMP_F);
+                            default: // Metric
+                                return 'MAX: 49' + FONT.symbol(SYM.TEMP_C);
+                        }
+                    }
+                },
+                {
+                    name: 'THERMAL_CENTER_TEMP',
+                    id: 203,
+                    min_version: '3.0.0',
+                    enabled: function() {
+                        return FC.FEATURES && FC.FEATURES.MZTC;
+                    },
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                                return 'CTR: 75' + FONT.symbol(SYM.TEMP_F);
+                            default: // Metric
+                                return 'CTR: 24' + FONT.symbol(SYM.TEMP_C);
+                        }
+                    }
+                },
+                {
+                    name: 'THERMAL_HOT_SPOT',
+                    id: 204,
+                    min_version: '3.0.0',
+                    enabled: function() {
+                        return FC.FEATURES && FC.FEATURES.MZTC;
+                    },
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                                return 'HOT: 120' + FONT.symbol(SYM.TEMP_F) + ' @80,60';
+                            default: // Metric
+                                return 'HOT: 49' + FONT.symbol(SYM.TEMP_C) + ' @80,60';
+                        }
+                    }
+                },
+                {
+                    name: 'THERMAL_COLD_SPOT',
+                    id: 205,
+                    min_version: '3.0.0',
+                    enabled: function() {
+                        return FC.FEATURES && FC.FEATURES.MZTC;
+                    },
+                    preview: function(osd_data) {
+                        switch (OSD.data.preferences.units) {
+                            case 0: // Imperial
+                                return 'COLD: 45' + FONT.symbol(SYM.TEMP_F) + ' @20,40';
+                            default: // Metric
+                                return 'COLD: 7' + FONT.symbol(SYM.TEMP_C) + ' @20,40';
+                        }
+                    }
+                },
+                {
+                    name: 'THERMAL_CAMERA_STATUS',
+                    id: 206,
+                    min_version: '3.0.0',
+                    enabled: function() {
+                        return FC.FEATURES && FC.FEATURES.MZTC;
+                    },
+                    preview: function(osd_data) {
+                        return 'TH: CONNECTED';
+                    }
+                },
+                {
+                    name: 'THERMAL_CAMERA_MODE',
+                    id: 207,
+                    min_version: '3.0.0',
+                    enabled: function() {
+                        return FC.FEATURES && FC.FEATURES.MZTC;
+                    },
+                    preview: function(osd_data) {
+                        return 'TH: CONTINUOUS';
+                    }
+                },
+                {
+                    name: 'THERMAL_CAMERA_PALETTE',
+                    id: 208,
+                    min_version: '3.0.0',
+                    enabled: function() {
+                        return FC.FEATURES && FC.FEATURES.MZTC;
+                    },
+                    preview: function(osd_data) {
+                        return 'TH: WHITE_HOT';
+                    }
+                },
+                {
+                    name: 'THERMAL_CAMERA_ZOOM',
+                    id: 209,
+                    min_version: '3.0.0',
+                    enabled: function() {
+                        return FC.FEATURES && FC.FEATURES.MZTC;
+                    },
+                    preview: function(osd_data) {
+                        return 'TH: 2X';
+                    }
+                },
+                {
                     name: 'SENSOR3_TEMPERATURE',
                     id: 90,
                     preview: function(osd_data) {
