@@ -25,6 +25,7 @@ i18n.init = function (callback) {
         ns: ['messages'],
         defaultNS:['messages'],
         fallbackLng: 'en',
+        load: 'languageOnly', // This will load 'en' for 'en-US'
         backend: {
             loadPath: path.join(__dirname, "./../locale/{{lng}}/{{ns}}.json"),
             parse: i18n.parseInputFile,

@@ -178,9 +178,19 @@ function createWindow() {
   mainWindowState.manage(mainWindow);
 
   // Open the DevTools.
-  if (process.env.NODE_ENV === 'development') {
-    mainWindow.webContents.openDevTools();
-  }
+  // Always open for debugging (remove the if statement to always open)
+  mainWindow.webContents.openDevTools();
+  
+  // Add keyboard shortcut for DevTools
+  mainWindow.webContents.on('before-input-event', (event, input) => {
+    // F12 or Ctrl+Shift+I (Cmd+Option+I on Mac)
+    if (input.key === 'F12' || 
+        (input.control && input.shift && input.key.toLowerCase() === 'i') ||
+        (input.meta && input.alt && input.key.toLowerCase() === 'i')) {
+      mainWindow.webContents.toggleDevTools();
+      event.preventDefault();
+    }
+  });
 };
 
 app.on('window-all-closed', () => {

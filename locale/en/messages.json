@@ -1373,6 +1373,60 @@
     "portsFunction_HEADTRACKER": {
         "message": "Serial Headtracker"
     },
+    "portsFunction_MZTC_CAMERA": {
+        "message": "MassZero Thermal Camera"
+    },
+    "configurationThermalCamera": {
+        "message": "MassZero Thermal Camera"
+    },
+    "thermalCameraDisclaimer": {
+        "message": "Configure thermal camera settings for real-time thermal imaging. MZTC must be selected as a peripheral on a UART port in the Ports tab."
+    },
+    "configurationThermalCameraEnabled": {
+        "message": "Thermal Camera Enabled"
+    },
+    "configurationThermalCameraPort": {
+        "message": "Serial Port"
+    },
+    "configurationThermalCameraMode": {
+        "message": "Operating Mode"
+    },
+    "configurationThermalCameraBrightness": {
+        "message": "Brightness (0-100)"
+    },
+    "configurationThermalCameraContrast": {
+        "message": "Contrast (0-100)"
+    },
+    "configurationThermalCameraPalette": {
+        "message": "Color Palette"
+    },
+    "configurationThermalCameraZoom": {
+        "message": "Zoom Level"
+    },
+    "configurationThermalCameraAutoShutter": {
+        "message": "Auto Shutter Mode"
+    },
+    "configurationThermalCameraFFCInterval": {
+        "message": "FFC Interval (minutes)"
+    },
+    "configurationThermalCameraTemperatureAlerts": {
+        "message": "Temperature Alerts"
+    },
+    "configurationThermalCameraAlertHighTemp": {
+        "message": "High Temperature Alert (°C)"
+    },
+    "configurationThermalCameraAlertLowTemp": {
+        "message": "Low Temperature Alert (°C)"
+    },
+    "configurationThermalCameraZoomChannel": {
+        "message": "Zoom Control Channel"
+    },
+    "configurationThermalCameraPaletteChannel": {
+        "message": "Palette Control Channel"
+    },
+    "configurationThermalCameraFFCChannel": {
+        "message": "FFC Control Channel"
+    },
     "pidTuning_Other": {
         "message": "Other"
     },
@@ -6232,6 +6286,27 @@
     },
     "configurationThermalCameraFFCChannel": {
         "message": "FFC Channel"
+    },
+    "configurationThermalCameraModeHelp": {
+        "message": "Operating modes:\n• Disabled - Camera is off\n• Standby - Low power, periodic updates\n• Continuous - Real-time frame capture\n• Triggered - Capture on demand\n• Alert - Only capture when temperature alerts triggered\n• Recording - High-speed recording mode\n• Calibration - Calibration mode\n• Surveillance - Long-range optimized"
+    },
+    "configurationThermalCameraBrightnessHelp": {
+        "message": "Adjusts image brightness (0-100). Default is 50. Lower values darken the image, higher values brighten it."
+    },
+    "configurationThermalCameraContrastHelp": {
+        "message": "Adjusts image contrast (0-100). Default is 50. Higher values increase the difference between hot and cold areas."
+    },
+    "configurationThermalCameraPaletteHelp": {
+        "message": "Color schemes for thermal display:\n• White Hot - Hot objects appear white\n• Black Hot - Hot objects appear black\n• Fusion 1/2 - Blended color modes\n• Rainbow - Full spectrum colors\n• Iron Red 1/2 - Industrial iron/red gradient\n• Sepia - Brown tones\n• Color 1/2 - Alternative color schemes\n• Ice Fire - Blue to red gradient\n• Rain - Blue/green gradient\n• Green/Red Hot - Single color gradients"
+    },
+    "configurationThermalCameraZoomHelp": {
+        "message": "Digital zoom levels:\n• 1X - No zoom (default)\n• 2X - 2x magnification\n• 4X - 4x magnification\n• 8X - 8x magnification\n\nNote: Higher zoom levels reduce field of view."
+    },
+    "configurationThermalCameraAutoShutterHelp": {
+        "message": "Automatic FFC (Flat Field Calibration) triggers:\n• Temperature Only - Calibrate only on temperature change\n• Time Only - Calibrate at fixed intervals (see FFC Interval)\n• Time and Temperature - Calibrate on either condition (default)\n\nFFC removes image artifacts and ensures accurate temperature readings."
+    },
+    "configurationThermalCameraFFCIntervalHelp": {
+        "message": "Time between automatic calibrations in minutes (1-60). Default is 5 minutes. Only used when Auto Shutter is set to 'Time Only' or 'Time and Temperature'."
     },
     "osd_thermal_temperature": {
         "message": "Thermal Temperature"

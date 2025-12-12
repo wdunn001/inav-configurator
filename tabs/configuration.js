@@ -29,11 +29,44 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         mspHelper.loadFeatures,
         mspHelper.loadSensorAlignment,
         mspHelper.loadAdvancedConfig,
-        mspHelper.loadVTXConfig,
+        // mspHelper.loadVTXConfig, // Not implemented yet
         mspHelper.loadBoardAlignment,
         mspHelper.loadCurrentMeterConfig,
         mspHelper.loadMiscV2
     ];
+    
+    // Load serial config first, then conditionally load MZTC
+    function loadSerialAndMZTC(callback) {
+        mspHelper.loadSerialPorts(function() {
+            // Now check if MZTC_CAMERA is selected
+            var mztcSelected = false;
+            if (FC.SERIAL_CONFIG && FC.SERIAL_CONFIG.ports) {
+                for (var i = 0; i < FC.SERIAL_CONFIG.ports.length; i++) {
+                    if (FC.SERIAL_CONFIG.ports[i].functions.indexOf('MZTC_CAMERA') >= 0) {
+                        mztcSelected = true;
+                        break;
+                    }
+                }
+            }
+            
+            if (mztcSelected) {
+                // Try to load MZTC config with a timeout
+                var timeoutId = setTimeout(function() {
+                    console.log('MZTC config load timeout - firmware may not support it yet');
+                    callback();
+                }, 500); // 500ms timeout
+                
+                mspHelper.loadMZTCConfig(function() {
+                    clearTimeout(timeoutId);
+                    callback();
+                });
+            } else {
+                callback();
+            }
+        });
+    }
+    
+    loadChain.push(loadSerialAndMZTC);
 
     loadChainer.setChain(loadChain);
     loadChainer.setExitPoint(load_html);
@@ -41,12 +74,35 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
 
     var saveChainer = new MSPChainerClass();
 
+    // Conditionally save MZTC config
+    function conditionallySaveMZTC(callback) {
+        console.log('conditionallySaveMZTC called, FC.MZTC_CONFIG:', FC.MZTC_CONFIG);
+        if (FC.MZTC_CONFIG && FC.MZTC_CONFIG.enabled) {
+            console.log('Saving MZTC config, enabled:', FC.MZTC_CONFIG.enabled, 'port:', FC.MZTC_CONFIG.port);
+            // Try to save MZTC config with a timeout
+            var timeoutId = setTimeout(function() {
+                console.log('MZTC config save timeout - firmware may not support it yet');
+                callback();
+            }, 500); // 500ms timeout
+            
+            mspHelper.saveMZTCConfig(function() {
+                clearTimeout(timeoutId);
+                console.log('MZTC config saved successfully');
+                callback();
+            });
+        } else {
+            console.log('Skipping MZTC save - not enabled or no config');
+            callback();
+        }
+    }
+    
     var saveChain = [
         mspHelper.saveAccTrim,
         mspHelper.saveAdvancedConfig,
-        mspHelper.saveVTXConfig,
+        // mspHelper.saveVTXConfig, // Not implemented yet
         mspHelper.saveCurrentMeterConfig,
         mspHelper.saveMiscV2,
+        conditionallySaveMZTC,
         saveSettings,
         mspHelper.saveToEeprom
     ];
@@ -273,6 +329,28 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
         $('a.save').on('click', function () {
             //UPDATE: moved to GPS tab and hidden
             //FC.MISC.mag_declination = parseFloat($('#mag_declination').val());
+            
+            // First, update MZTC hidden fields based on port selection
+            var mztcSelected = false;
+            var mztcPort = 0;
+            for (var portIndex = 0; portIndex < FC.SERIAL_CONFIG.ports.length; portIndex++) {
+                var serialPort = FC.SERIAL_CONFIG.ports[portIndex];
+                if (serialPort.functions.indexOf('MZTC_CAMERA') >= 0) {
+                    mztcSelected = true;
+                    // Map identifier to port number
+                    mztcPort = serialPort.identifier + 1;
+                    if (serialPort.identifier >= 5) {
+                        mztcPort = 6; // UART6
+                    }
+                    break;
+                }
+            }
+            
+            // Set the hidden fields for Settings framework
+            $('#mztc_enabled').val(mztcSelected ? 1 : 0);
+            $('#mztc_port').val(mztcPort);
+            console.log('Setting mztc_enabled hidden field to:', mztcSelected ? 1 : 0);
+            console.log('Setting mztc_port hidden field to:', mztcPort);
 
             FC.MISC.battery_cells = parseInt($('#cells').val());
             FC.MISC.voltage_source = parseInt($('#voltagesource').val());
@@ -292,6 +370,67 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
             features.execute(function () {
                 FC.CURRENT_METER_CONFIG.scale = parseInt($('#currentscale').val());
                 FC.CURRENT_METER_CONFIG.offset = Math.round(parseFloat($('#currentoffset').val()) * 10);
+                
+                // Save MZTC configuration if MZTC_CONFIG exists
+                if (FC.MZTC_CONFIG) {
+                    // Check if MZTC_CAMERA is selected on any UART and auto-enable
+                    var mztcSelected = false;
+                    var selectedPort = 0;
+                    var selectedBaudrate = 8; // Default to 115200
+                    
+                    for (var portIndex = 0; portIndex < FC.SERIAL_CONFIG.ports.length; portIndex++) {
+                        var serialPort = FC.SERIAL_CONFIG.ports[portIndex];
+                        if (serialPort.functions.indexOf('MZTC_CAMERA') >= 0) {
+                            mztcSelected = true;
+                            // Map identifier to UART number (0=UART1, 1=UART2, 2=UART3, etc.)
+                            selectedPort = serialPort.identifier + 1;
+                            if (serialPort.identifier >= 5) {
+                                selectedPort = 6; // UART6
+                            }
+                            selectedBaudrate = serialPort.peripherals_baudrate;
+                            console.log('Port mapping: UART identifier', serialPort.identifier, '-> MZTC port', selectedPort, 'baudrate:', selectedBaudrate);
+                            break;
+                        }
+                    }
+                    
+                    // Automatically set enabled and port based on peripheral selection
+                    if (mztcSelected) {
+                        FC.MZTC_CONFIG.enabled = 1;
+                        FC.MZTC_CONFIG.port = selectedPort;
+                        FC.MZTC_CONFIG.baudrate = selectedBaudrate;
+                        console.log('MZTC auto-enabled on port', selectedPort, 'with baudrate index', selectedBaudrate);
+                        
+                        // Get values from UI
+                        FC.MZTC_CONFIG.mode = parseInt($('#mztc_mode').val());
+                        FC.MZTC_CONFIG.brightness = parseInt($('#mztc_brightness').val());
+                        FC.MZTC_CONFIG.contrast = parseInt($('#mztc_contrast').val());
+                        FC.MZTC_CONFIG.palette_mode = parseInt($('#mztc_palette_mode').val());
+                        FC.MZTC_CONFIG.zoom_level = parseInt($('#mztc_zoom_level').val());
+                        FC.MZTC_CONFIG.auto_shutter = parseInt($('#mztc_auto_shutter').val());
+                        FC.MZTC_CONFIG.ffc_interval = parseInt($('#mztc_ffc_interval').val());
+                        
+                        // Set defaults for fields not in UI
+                        FC.MZTC_CONFIG.update_rate = FC.MZTC_CONFIG.update_rate || 9;
+                        FC.MZTC_CONFIG.temperature_unit = FC.MZTC_CONFIG.temperature_unit || 0;
+                        FC.MZTC_CONFIG.digital_enhancement = FC.MZTC_CONFIG.digital_enhancement || 50;
+                        FC.MZTC_CONFIG.spatial_denoise = FC.MZTC_CONFIG.spatial_denoise || 50;
+                        FC.MZTC_CONFIG.temporal_denoise = FC.MZTC_CONFIG.temporal_denoise || 50;
+                        FC.MZTC_CONFIG.mirror_mode = FC.MZTC_CONFIG.mirror_mode || 0;
+                        FC.MZTC_CONFIG.crosshair_enabled = FC.MZTC_CONFIG.crosshair_enabled || 0;
+                        FC.MZTC_CONFIG.bad_pixel_removal = FC.MZTC_CONFIG.bad_pixel_removal !== undefined ? FC.MZTC_CONFIG.bad_pixel_removal : 1;
+                        FC.MZTC_CONFIG.vignetting_correction = FC.MZTC_CONFIG.vignetting_correction !== undefined ? FC.MZTC_CONFIG.vignetting_correction : 1;
+                        
+                        // Temperature alerts temporarily disabled
+                        FC.MZTC_CONFIG.temperature_alerts = 0;
+                        FC.MZTC_CONFIG.alert_high_temp = 80.0;
+                        FC.MZTC_CONFIG.alert_low_temp = -10.0;
+                    } else {
+                        // Disable if not selected
+                        FC.MZTC_CONFIG.enabled = 0;
+                        FC.MZTC_CONFIG.port = 0;
+                    }
+                }
+                
                 saveChainer.execute();
             });
         });
@@ -309,33 +448,79 @@ TABS.configuration.cleanup = function (callback) {
 };
 
 function initializeThermalCamera() {
-    // Thermal Camera Enabled/Disabled
-    var mztcEnabled = $('#mztc_enabled');
-    mztcEnabled.empty();
-    $('<option value="0">Disabled</option>').appendTo(mztcEnabled);
-    $('<option value="1">Enabled</option>').appendTo(mztcEnabled);
-    mztcEnabled.val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.enabled : 0);
+    // Initialize MZTC_CONFIG with defaults if not present
+    if (!FC.MZTC_CONFIG) {
+        FC.MZTC_CONFIG = {
+            enabled: 0,
+            port: 0,
+            baudrate: 8, // Index for 115200 baud
+            mode: 2, // Continuous mode
+            update_rate: 9, // 9 Hz
+            temperature_unit: 0, // Celsius
+            brightness: 50,
+            contrast: 50,
+            digital_enhancement: 50,
+            spatial_denoise: 50,
+            temporal_denoise: 50,
+            palette_mode: 0,
+            zoom_level: 0,
+            mirror_mode: 0,
+            auto_shutter: 2, // Time and Temperature
+            crosshair_enabled: 0,
+            temperature_alerts: 0,
+            alert_high_temp: 80.0,
+            alert_low_temp: -10.0,
+            ffc_interval: 5,
+            bad_pixel_removal: 1,
+            vignetting_correction: 1,
+            zoom_channel: 0,
+            palette_channel: 0,
+            ffc_channel: 0
+        };
+    }
+    
+    // Auto-enable and set port if MZTC_CAMERA is selected on any UART
+    var mztcSelected = false;
+    var selectedPort = 0;
+    for (var portIndex = 0; portIndex < FC.SERIAL_CONFIG.ports.length; portIndex++) {
+        var serialPort = FC.SERIAL_CONFIG.ports[portIndex];
+        if (serialPort.functions.indexOf('MZTC_CAMERA') >= 0) {
+            mztcSelected = true;
+            // Map identifier to UART number (0=UART1, 1=UART2, 2=UART3, 5=UART6)
+            selectedPort = serialPort.identifier + 1;
+            if (serialPort.identifier >= 5) {
+                selectedPort = 6; // UART6
+            }
+            break;
+        }
+    }
+    
+    // Automatically enable and set port based on peripheral selection
+    if (mztcSelected) {
+        FC.MZTC_CONFIG.enabled = 1;
+        FC.MZTC_CONFIG.port = selectedPort;
+        // Also set the hidden input fields for Settings framework
+        $('#mztc_enabled').val(1);
+        $('#mztc_port').val(selectedPort);
+    } else {
+        FC.MZTC_CONFIG.enabled = 0;
+        FC.MZTC_CONFIG.port = 0;
+        // Also set the hidden input fields for Settings framework
+        $('#mztc_enabled').val(0);
+        $('#mztc_port').val(0);
+    }
 
-    // Serial Port
-    var mztcPort = $('#mztc_port');
-    mztcPort.empty();
-    $('<option value="0">None</option>').appendTo(mztcPort);
-    $('<option value="1">USART1</option>').appendTo(mztcPort);
-    $('<option value="2">USART2</option>').appendTo(mztcPort);
-    $('<option value="3">USART3</option>').appendTo(mztcPort);
-    $('<option value="6">USART6</option>').appendTo(mztcPort);
-    mztcPort.val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.port : 0);
 
-    // Baud Rate
-    var mztcBaudrate = $('#mztc_baudrate');
-    mztcBaudrate.empty();
-    $('<option value="9600">9600</option>').appendTo(mztcBaudrate);
-    $('<option value="19200">19200</option>').appendTo(mztcBaudrate);
-    $('<option value="38400">38400</option>').appendTo(mztcBaudrate);
-    $('<option value="57600">57600</option>').appendTo(mztcBaudrate);
-    $('<option value="115200">115200</option>').appendTo(mztcBaudrate);
-    $('<option value="230400">230400</option>').appendTo(mztcBaudrate);
-    mztcBaudrate.val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.baudrate : 115200);
+    // Get baudrate from the selected port
+    for (var portIndex = 0; portIndex < FC.SERIAL_CONFIG.ports.length; portIndex++) {
+        var serialPort = FC.SERIAL_CONFIG.ports[portIndex];
+        if (serialPort.functions.indexOf('MZTC_CAMERA') >= 0) {
+            // Use the baudrate from the port configuration
+            // Note: peripherals_baudrate is what's used for peripheral devices
+            FC.MZTC_CONFIG.baudrate = serialPort.peripherals_baudrate;
+            break;
+        }
+    }
 
     // Operating Mode
     var mztcMode = $('#mztc_mode');
@@ -348,13 +533,13 @@ function initializeThermalCamera() {
     $('<option value="5">Recording</option>').appendTo(mztcMode);
     $('<option value="6">Calibration</option>').appendTo(mztcMode);
     $('<option value="7">Surveillance</option>').appendTo(mztcMode);
-    mztcMode.val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.mode : 2);
+    mztcMode.val(FC.MZTC_CONFIG.mode);
 
     // Brightness
-    $('#mztc_brightness').val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.brightness : 50);
+    $('#mztc_brightness').val(FC.MZTC_CONFIG.brightness);
 
     // Contrast
-    $('#mztc_contrast').val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.contrast : 50);
+    $('#mztc_contrast').val(FC.MZTC_CONFIG.contrast);
 
     // Color Palette
     var mztcPalette = $('#mztc_palette_mode');
@@ -373,7 +558,7 @@ function initializeThermalCamera() {
     $('<option value="11">Rain</option>').appendTo(mztcPalette);
     $('<option value="12">Green Hot</option>').appendTo(mztcPalette);
     $('<option value="13">Red Hot</option>').appendTo(mztcPalette);
-    mztcPalette.val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.palette_mode : 0);
+    mztcPalette.val(FC.MZTC_CONFIG.palette_mode);
 
     // Zoom Level
     var mztcZoom = $('#mztc_zoom_level');
@@ -382,7 +567,7 @@ function initializeThermalCamera() {
     $('<option value="1">2X</option>').appendTo(mztcZoom);
     $('<option value="2">4X</option>').appendTo(mztcZoom);
     $('<option value="3">8X</option>').appendTo(mztcZoom);
-    mztcZoom.val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.zoom_level : 0);
+    mztcZoom.val(FC.MZTC_CONFIG.zoom_level);
 
     // Auto Shutter
     var mztcAutoShutter = $('#mztc_auto_shutter');
@@ -390,50 +575,43 @@ function initializeThermalCamera() {
     $('<option value="0">Temperature Only</option>').appendTo(mztcAutoShutter);
     $('<option value="1">Time Only</option>').appendTo(mztcAutoShutter);
     $('<option value="2">Time and Temperature</option>').appendTo(mztcAutoShutter);
-    mztcAutoShutter.val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.auto_shutter : 2);
+    mztcAutoShutter.val(FC.MZTC_CONFIG.auto_shutter);
+    
+    // Add change handler to show/hide FFC interval based on auto shutter mode
+    mztcAutoShutter.on('change', function() {
+        var selectedMode = parseInt($(this).val());
+        if (selectedMode === 0) { // Temperature Only
+            $('.mztc_ffc_interval_wrapper').hide();
+        } else {
+            $('.mztc_ffc_interval_wrapper').show();
+        }
+    });
 
     // FFC Interval
-    $('#mztc_ffc_interval').val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.ffc_interval : 5);
+    $('#mztc_ffc_interval').val(FC.MZTC_CONFIG.ffc_interval);
+    
+    // Hide FFC interval if auto shutter is temperature only
+    if (FC.MZTC_CONFIG.auto_shutter === 0) {
+        $('.mztc_ffc_interval_wrapper').hide();
+    }
 
-    // Temperature Alerts
+    // Temperature Alerts - temporarily hidden
+    /*
     var mztcTempAlerts = $('#mztc_temperature_alerts');
     mztcTempAlerts.empty();
     $('<option value="0">Disabled</option>').appendTo(mztcTempAlerts);
     $('<option value="1">Enabled</option>').appendTo(mztcTempAlerts);
-    mztcTempAlerts.val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.temperature_alerts : 1);
+    mztcTempAlerts.val(FC.MZTC_CONFIG.temperature_alerts);
 
     // Alert Temperatures
-    $('#mztc_alert_high_temp').val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.alert_high_temp : 80.0);
-    $('#mztc_alert_low_temp').val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.alert_low_temp : -10.0);
+    $('#mztc_alert_high_temp').val(FC.MZTC_CONFIG.alert_high_temp);
+    $('#mztc_alert_low_temp').val(FC.MZTC_CONFIG.alert_low_temp);
+    */
 
-    // RC Channels
-    var mztcZoomChannel = $('#mztc_zoom_channel');
-    mztcZoomChannel.empty();
-    $('<option value="0">None</option>').appendTo(mztcZoomChannel);
-    for (let i = 1; i <= 6; i++) {
-        $('<option value="' + i + '">AUX' + i + '</option>').appendTo(mztcZoomChannel);
-    }
-    mztcZoomChannel.val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.zoom_channel : 0);
 
-    var mztcPaletteChannel = $('#mztc_palette_channel');
-    mztcPaletteChannel.empty();
-    $('<option value="0">None</option>').appendTo(mztcPaletteChannel);
-    for (let i = 1; i <= 6; i++) {
-        $('<option value="' + i + '">AUX' + i + '</option>').appendTo(mztcPaletteChannel);
-    }
-    mztcPaletteChannel.val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.palette_channel : 0);
-
-    var mztcFfcChannel = $('#mztc_ffc_channel');
-    mztcFfcChannel.empty();
-    $('<option value="0">None</option>').appendTo(mztcFfcChannel);
-    for (let i = 1; i <= 6; i++) {
-        $('<option value="' + i + '">AUX' + i + '</option>').appendTo(mztcFfcChannel);
-    }
-    mztcFfcChannel.val(FC.MZTC_CONFIG ? FC.MZTC_CONFIG.ffc_channel : 0);
-
-    // Show/hide thermal camera section based on feature support
+    // Show/hide thermal camera section based on serial port selection
     var configThermalCamera = $('.config-thermal-camera');
-    if (FC.FEATURES && FC.FEATURES.MZTC) {
+    if (mztcSelected) {
         configThermalCamera.show();
     } else {
         configThermalCamera.hide();

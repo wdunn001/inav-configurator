@@ -131,6 +131,12 @@ const serialPortHelper = (function () {
             name: 'HEADTRACKER',
             groups: ['peripherals'],
             defaultBaud: 115200
+        },
+        {
+            name: 'MZTC_CAMERA',
+            groups: ['peripherals'],
+            defaultBaud: 115200,
+            isUnique: true
         }
     ];
 
@@ -161,7 +167,8 @@ const serialPortHelper = (function () {
         'SMARTPORT_MASTER': 23,
         'MSP_DISPLAYPORT': 25,
         'GIMBAL': 26,
-        'HEADTRACKER': 27
+        'HEADTRACKER': 27,
+        'MZTC_CAMERA': 28
     };
 
     privateScope.identifierToName = {

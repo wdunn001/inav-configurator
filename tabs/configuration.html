@@ -301,34 +301,16 @@
                     <div class="spacer_box_title" data-i18n="configurationThermalCamera"></div>
                 </div>
                 <div class="spacer_box">
-                    <div class="info-box" data-i18n="thermalCameraDisclaimer"></div>
+                    <!-- Hidden fields for auto-set values -->
+                    <input type="hidden" id="mztc_enabled" data-setting="mztc_enabled" />
+                    <input type="hidden" id="mztc_port" data-setting="mztc_port" />
                     
-                    <div class="select">
-                        <select id="mztc_enabled" data-setting="mztc_enabled"></select>
-                        <label for="mztc_enabled">
-                            <span data-i18n="configurationThermalCameraEnabled"></span>
-                        </label>
-                    </div>
-
-                    <div class="select mztc_port_wrapper">
-                        <select id="mztc_port" data-setting="mztc_port"></select>
-                        <label for="mztc_port">
-                            <span data-i18n="configurationThermalCameraPort"></span>
-                        </label>
-                    </div>
-
-                    <div class="select mztc_baudrate_wrapper">
-                        <select id="mztc_baudrate" data-setting="mztc_baudrate"></select>
-                        <label for="mztc_baudrate">
-                            <span data-i18n="configurationThermalCameraBaudrate"></span>
-                        </label>
-                    </div>
-
                     <div class="select mztc_mode_wrapper">
                         <select id="mztc_mode" data-setting="mztc_mode"></select>
                         <label for="mztc_mode">
                             <span data-i18n="configurationThermalCameraMode"></span>
                         </label>
+                        <div for="mztc_mode" class="helpicon cf_tip" data-i18n_title="configurationThermalCameraModeHelp"></div>
                     </div>
 
                     <div class="number mztc_brightness_wrapper">
@@ -336,6 +318,7 @@
                         <label for="mztc_brightness">
                             <span data-i18n="configurationThermalCameraBrightness"></span>
                         </label>
+                        <div for="mztc_brightness" class="helpicon cf_tip" data-i18n_title="configurationThermalCameraBrightnessHelp"></div>
                     </div>
 
                     <div class="number mztc_contrast_wrapper">
@@ -343,6 +326,7 @@
                         <label for="mztc_contrast">
                             <span data-i18n="configurationThermalCameraContrast"></span>
                         </label>
+                        <div for="mztc_contrast" class="helpicon cf_tip" data-i18n_title="configurationThermalCameraContrastHelp"></div>
                     </div>
 
                     <div class="select mztc_palette_wrapper">
@@ -350,6 +334,7 @@
                         <label for="mztc_palette_mode">
                             <span data-i18n="configurationThermalCameraPalette"></span>
                         </label>
+                        <div for="mztc_palette_mode" class="helpicon cf_tip" data-i18n_title="configurationThermalCameraPaletteHelp"></div>
                     </div>
 
                     <div class="select mztc_zoom_wrapper">
@@ -357,6 +342,7 @@
                         <label for="mztc_zoom_level">
                             <span data-i18n="configurationThermalCameraZoom"></span>
                         </label>
+                        <div for="mztc_zoom_level" class="helpicon cf_tip" data-i18n_title="configurationThermalCameraZoomHelp"></div>
                     </div>
 
                     <div class="select mztc_auto_shutter_wrapper">
@@ -364,6 +350,7 @@
                         <label for="mztc_auto_shutter">
                             <span data-i18n="configurationThermalCameraAutoShutter"></span>
                         </label>
+                        <div for="mztc_auto_shutter" class="helpicon cf_tip" data-i18n_title="configurationThermalCameraAutoShutterHelp"></div>
                     </div>
 
                     <div class="number mztc_ffc_interval_wrapper">
@@ -371,8 +358,10 @@
                         <label for="mztc_ffc_interval">
                             <span data-i18n="configurationThermalCameraFFCInterval"></span>
                         </label>
+                        <div for="mztc_ffc_interval" class="helpicon cf_tip" data-i18n_title="configurationThermalCameraFFCIntervalHelp"></div>
                     </div>
 
+                    <!-- Temperature alerts temporarily hidden
                     <div class="select mztc_temperature_alerts_wrapper">
                         <select id="mztc_temperature_alerts" data-setting="mztc_temperature_alerts"></select>
                         <label for="mztc_temperature_alerts">
@@ -393,27 +382,8 @@
                             <span data-i18n="configurationThermalCameraAlertLowTemp"></span>
                         </label>
                     </div>
+                    -->
 
-                    <div class="select mztc_zoom_channel_wrapper">
-                        <select id="mztc_zoom_channel" data-setting="mztc_zoom_channel"></select>
-                        <label for="mztc_zoom_channel">
-                            <span data-i18n="configurationThermalCameraZoomChannel"></span>
-                        </label>
-                    </div>
-
-                    <div class="select mztc_palette_channel_wrapper">
-                        <select id="mztc_palette_channel" data-setting="mztc_palette_channel"></select>
-                        <label for="mztc_palette_channel">
-                            <span data-i18n="configurationThermalCameraPaletteChannel"></span>
-                        </label>
-                    </div>
-
-                    <div class="select mztc_ffc_channel_wrapper">
-                        <select id="mztc_ffc_channel" data-setting="mztc_ffc_channel"></select>
-                        <label for="mztc_ffc_channel">
-                            <span data-i18n="configurationThermalCameraFFCChannel"></span>
-                        </label>
-                    </div>
                 </div>
             </div>
         </div>
