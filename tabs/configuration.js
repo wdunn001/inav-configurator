@@ -337,11 +337,9 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                 var serialPort = FC.SERIAL_CONFIG.ports[portIndex];
                 if (serialPort.functions.indexOf('MZTC_CAMERA') >= 0) {
                     mztcSelected = true;
-                    // Map identifier to port number
-                    mztcPort = serialPort.identifier + 1;
-                    if (serialPort.identifier >= 5) {
-                        mztcPort = 6; // UART6
-                    }
+                    // mztc_port is the zero-based serialPortIdentifier_e value
+                    // that the firmware hands to openSerialPort().
+                    mztcPort = serialPort.identifier;
                     break;
                 }
             }
@@ -382,13 +380,10 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                         var serialPort = FC.SERIAL_CONFIG.ports[portIndex];
                         if (serialPort.functions.indexOf('MZTC_CAMERA') >= 0) {
                             mztcSelected = true;
-                            // Map identifier to UART number (0=UART1, 1=UART2, 2=UART3, etc.)
-                            selectedPort = serialPort.identifier + 1;
-                            if (serialPort.identifier >= 5) {
-                                selectedPort = 6; // UART6
-                            }
+                            // mztc_port is the zero-based serialPortIdentifier_e
+                            // value, so UART1 is 0 and UART2 is 1.
+                            selectedPort = serialPort.identifier;
                             selectedBaudrate = serialPort.peripherals_baudrate;
-                            console.log('Port mapping: UART identifier', serialPort.identifier, '-> MZTC port', selectedPort, 'baudrate:', selectedBaudrate);
                             break;
                         }
                     }
@@ -411,19 +406,12 @@ TABS.configuration.initialize = function (callback, scrollPosition) {
                         
                         // Set defaults for fields not in UI
                         FC.MZTC_CONFIG.update_rate = FC.MZTC_CONFIG.update_rate || 9;
-                        FC.MZTC_CONFIG.temperature_unit = FC.MZTC_CONFIG.temperature_unit || 0;
                         FC.MZTC_CONFIG.digital_enhancement = FC.MZTC_CONFIG.digital_enhancement || 50;
                         FC.MZTC_CONFIG.spatial_denoise = FC.MZTC_CONFIG.spatial_denoise || 50;
                         FC.MZTC_CONFIG.temporal_denoise = FC.MZTC_CONFIG.temporal_denoise || 50;
                         FC.MZTC_CONFIG.mirror_mode = FC.MZTC_CONFIG.mirror_mode || 0;
-                        FC.MZTC_CONFIG.crosshair_enabled = FC.MZTC_CONFIG.crosshair_enabled || 0;
-                        FC.MZTC_CONFIG.bad_pixel_removal = FC.MZTC_CONFIG.bad_pixel_removal !== undefined ? FC.MZTC_CONFIG.bad_pixel_removal : 1;
-                        FC.MZTC_CONFIG.vignetting_correction = FC.MZTC_CONFIG.vignetting_correction !== undefined ? FC.MZTC_CONFIG.vignetting_correction : 1;
                         
                         // Temperature alerts temporarily disabled
-                        FC.MZTC_CONFIG.temperature_alerts = 0;
-                        FC.MZTC_CONFIG.alert_high_temp = 80.0;
-                        FC.MZTC_CONFIG.alert_low_temp = -10.0;
                     } else {
                         // Disable if not selected
                         FC.MZTC_CONFIG.enabled = 0;
@@ -454,9 +442,8 @@ function initializeThermalCamera() {
             enabled: 0,
             port: 0,
             baudrate: 8, // Index for 115200 baud
-            mode: 2, // Continuous mode
+            mode: 1, // Standby
             update_rate: 9, // 9 Hz
-            temperature_unit: 0, // Celsius
             brightness: 50,
             contrast: 50,
             digital_enhancement: 50,
@@ -467,15 +454,7 @@ function initializeThermalCamera() {
             mirror_mode: 0,
             auto_shutter: 2, // Time and Temperature
             crosshair_enabled: 0,
-            temperature_alerts: 0,
-            alert_high_temp: 80.0,
-            alert_low_temp: -10.0,
-            ffc_interval: 5,
-            bad_pixel_removal: 1,
-            vignetting_correction: 1,
-            zoom_channel: 0,
-            palette_channel: 0,
-            ffc_channel: 0
+            ffc_interval: 5
         };
     }
     
@@ -486,11 +465,8 @@ function initializeThermalCamera() {
         var serialPort = FC.SERIAL_CONFIG.ports[portIndex];
         if (serialPort.functions.indexOf('MZTC_CAMERA') >= 0) {
             mztcSelected = true;
-            // Map identifier to UART number (0=UART1, 1=UART2, 2=UART3, 5=UART6)
-            selectedPort = serialPort.identifier + 1;
-            if (serialPort.identifier >= 5) {
-                selectedPort = 6; // UART6
-            }
+            // mztc_port is the zero-based serialPortIdentifier_e value.
+            selectedPort = serialPort.identifier;
             break;
         }
     }
@@ -594,20 +570,6 @@ function initializeThermalCamera() {
     if (FC.MZTC_CONFIG.auto_shutter === 0) {
         $('.mztc_ffc_interval_wrapper').hide();
     }
-
-    // Temperature Alerts - temporarily hidden
-    /*
-    var mztcTempAlerts = $('#mztc_temperature_alerts');
-    mztcTempAlerts.empty();
-    $('<option value="0">Disabled</option>').appendTo(mztcTempAlerts);
-    $('<option value="1">Enabled</option>').appendTo(mztcTempAlerts);
-    mztcTempAlerts.val(FC.MZTC_CONFIG.temperature_alerts);
-
-    // Alert Temperatures
-    $('#mztc_alert_high_temp').val(FC.MZTC_CONFIG.alert_high_temp);
-    $('#mztc_alert_low_temp').val(FC.MZTC_CONFIG.alert_low_temp);
-    */
-
 
     // Show/hide thermal camera section based on serial port selection
     var configThermalCamera = $('.config-thermal-camera');

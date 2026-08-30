@@ -248,20 +248,20 @@ var MSPCodes = {
     MSP2_INAV_SET_GEOZONE:             0x2211,
     MSP2_INAV_GEOZONE_VERTEX:        0x2212,
 
-    // MassZero Thermal Camera MSP2 commands
-    MSP2_MZTC_CONFIG:                  0x3000,
-    MSP2_SET_MZTC_CONFIG:              0x3001,
-    MSP2_MZTC_STATUS:                  0x3002,
-    MSP2_MZTC_FRAME_DATA:              0x3003,
-    MSP2_MZTC_CALIBRATE:               0x3004,
-    MSP2_MZTC_MODE:                    0x3005,
-    MSP2_MZTC_PALETTE:                 0x3006,
-    MSP2_MZTC_ZOOM:                    0x3007,
-    MSP2_MZTC_SHUTTER:                 0x3008,
-    MSP2_MZTC_INIT_STATUS:             0x3009,
-    MSP2_MZTC_SAVE_CONFIG:             0x300A,
-    MSP2_MZTC_RESTORE_DEFAULTS:        0x300B,
-    MSP2_MZTC_RECONNECT:               0x300C,
+    // MassZero Thermal Camera MSP2 commands.
+    // These sit in INAV's own 0x2000-0x2FFF range. The 0x3000 block belongs to
+    // the Betaflight compatibility commands. MSP2_BETAFLIGHT_BIND is 0x3000.
+    // MSP2_RX_BIND is 0x3001.
+    MSP2_MZTC_CONFIG:                  0x2240,
+    MSP2_MZTC_STATUS:                  0x2241,
+    MSP2_SET_MZTC_CONFIG:              0x2242,
+    MSP2_SET_MZTC_MODE:                0x2243,
+    MSP2_SET_MZTC_PALETTE:             0x2244,
+    MSP2_SET_MZTC_ZOOM:                0x2245,
+    MSP2_SET_MZTC_SHUTTER:             0x2246,
+    MSP2_SET_MZTC_IMAGE_PARAMS:        0x2247,
+    MSP2_SET_MZTC_CORRECTION:          0x2248,
+    MSP2_SET_MZTC_VIGNETTING:          0x2249,
     MSP2_INAV_SET_GEOZONE_VERTICE:    0x2213
 
 };

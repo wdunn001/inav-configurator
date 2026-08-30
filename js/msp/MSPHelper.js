@@ -1664,75 +1664,66 @@ var mspHelper = (function () {
                 break;    
 
         case MSPCodes.MSP2_MZTC_CONFIG:
-            // Process MZTC configuration data from flight controller
-            // The firmware sends only the msp_mztc_config_t structure (28 bytes + padding)
-            // Channel fields are not included in the MSP message
-            if (data.byteLength >= 28) {  // Minimum expected bytes
+            // Fixed 15 byte payload, little endian, one field at a time.
+            // The firmware writes it with the sbufWrite helpers, so there is no
+            // compiler padding to account for here.
+            if (data.byteLength >= 15) {
                 FC.MZTC_CONFIG = {
                     enabled: data.getUint8(0),
                     port: data.getUint8(1),
                     baudrate: data.getUint8(2),
                     mode: data.getUint8(3),
                     update_rate: data.getUint8(4),
-                    temperature_unit: data.getUint8(5),
-                    palette_mode: data.getUint8(6),
-                    auto_shutter: data.getUint8(7),
-                    digital_enhancement: data.getUint8(8),
-                    spatial_denoise: data.getUint8(9),
-                    temporal_denoise: data.getUint8(10),
-                    brightness: data.getUint8(11),
-                    contrast: data.getUint8(12),
-                    zoom_level: data.getUint8(13),
-                    mirror_mode: data.getUint8(14),
-                    crosshair_enabled: data.getUint8(15),
-                    temperature_alerts: data.getUint8(16),
-                    // Temperatures are stored as float32
-                    alert_high_temp: data.getFloat32(17, true),
-                    alert_low_temp: data.getFloat32(21, true),
-                    ffc_interval: data.getUint8(25),
-                    bad_pixel_removal: data.getUint8(26),
-                    vignetting_correction: data.getUint8(27),
-                    // Channel fields not included in firmware MSP message
-                    zoom_channel: 0,
-                    palette_channel: 0,
-                    ffc_channel: 0,
-                    brightness_channel: 0,
-                    contrast_channel: 0
+                    palette_mode: data.getUint8(5),
+                    auto_shutter: data.getUint8(6),
+                    digital_enhancement: data.getUint8(7),
+                    spatial_denoise: data.getUint8(8),
+                    temporal_denoise: data.getUint8(9),
+                    brightness: data.getUint8(10),
+                    contrast: data.getUint8(11),
+                    zoom_level: data.getUint8(12),
+                    mirror_mode: data.getUint8(13),
+                    ffc_interval: data.getUint8(14)
                 };
-                } else {
-                    console.log('MZTC_CONFIG data too short:', data.byteLength, 'bytes, expected at least 28');
-                    // Initialize with defaults
-                    FC.MZTC_CONFIG = {
-                        enabled: 0,
-                        port: 0,
-                        baudrate: 8,
-                        mode: 2,
-                        update_rate: 9,
-                        temperature_unit: 0,
-                        brightness: 50,
-                        contrast: 50,
-                        digital_enhancement: 50,
-                        spatial_denoise: 50,
-                        temporal_denoise: 50,
-                        palette_mode: 0,
-                        zoom_level: 0,
-                        mirror_mode: 0,
-                        auto_shutter: 2,
-                        crosshair_enabled: 0,
-                        temperature_alerts: 0,
-                        alert_high_temp: 80.0,
-                        alert_low_temp: -10.0,
-                        ffc_interval: 5,
-                        bad_pixel_removal: 1,
-                        vignetting_correction: 1,
-                        zoom_channel: 0,
-                        palette_channel: 0,
-                        ffc_channel: 0,
-                        brightness_channel: 0,
-                        contrast_channel: 0
-                    };
-                }
-                break;
+            } else {
+                console.log('MZTC_CONFIG payload too short:', data.byteLength, 'bytes, expected 15');
+                FC.MZTC_CONFIG = {
+                    enabled: 0,
+                    port: 1,
+                    baudrate: 8,
+                    mode: 1,
+                    update_rate: 9,
+                    palette_mode: 0,
+                    auto_shutter: 2,
+                    digital_enhancement: 50,
+                    spatial_denoise: 50,
+                    temporal_denoise: 50,
+                    brightness: 50,
+                    contrast: 50,
+                    zoom_level: 0,
+                    mirror_mode: 0,
+                    ffc_interval: 5
+                };
+            }
+            break;
+
+        case MSPCodes.MSP2_MZTC_STATUS:
+            // Fixed 7 byte payload. connected is set only after the camera has
+            // answered a command. An open UART on its own does not set it.
+            if (data.byteLength >= 7) {
+                FC.MZTC_STATUS = {
+                    status: data.getUint8(0),
+                    mode: data.getUint8(1),
+                    connected: data.getUint8(2),
+                    connection_quality: data.getUint8(3),
+                    last_calibration: data.getUint16(4, true),
+                    error_flags: data.getUint8(6)
+                };
+            } else {
+                console.log('MZTC_STATUS payload too short:', data.byteLength, 'bytes, expected 7');
+                FC.MZTC_STATUS = null;
+            }
+            break;
 
             case MSPCodes.MSP2_SET_MZTC_CONFIG:
                 console.log("MZTC config saved");
@@ -2341,51 +2332,25 @@ var mspHelper = (function () {
                 break;
 
         case MSPCodes.MSP2_SET_MZTC_CONFIG:
-            // Prepare MZTC configuration data for sending to flight controller
-            // Must match msp_mztc_config_t structure exactly (no channel fields)
-            console.log('MSP2_SET_MZTC_CONFIG - sending:', {
-                enabled: FC.MZTC_CONFIG.enabled,
-                port: FC.MZTC_CONFIG.port,
-                baudrate: FC.MZTC_CONFIG.baudrate,
-                mode: FC.MZTC_CONFIG.mode
-            });
-            buffer.push(FC.MZTC_CONFIG.enabled);
+            // Fixed 15 byte payload matching MSP2_MZTC_CONFIG. The firmware
+            // validates the whole request before applying any of it, so an out
+            // of range value here is rejected in full.
+            buffer.push(FC.MZTC_CONFIG.enabled ? 1 : 0);
             buffer.push(FC.MZTC_CONFIG.port);
             buffer.push(FC.MZTC_CONFIG.baudrate);
             buffer.push(FC.MZTC_CONFIG.mode);
-            buffer.push(FC.MZTC_CONFIG.update_rate || 9);
-            buffer.push(FC.MZTC_CONFIG.temperature_unit || 0);
+            buffer.push(FC.MZTC_CONFIG.update_rate);
             buffer.push(FC.MZTC_CONFIG.palette_mode);
             buffer.push(FC.MZTC_CONFIG.auto_shutter);
-            buffer.push(FC.MZTC_CONFIG.digital_enhancement || 50);
-            buffer.push(FC.MZTC_CONFIG.spatial_denoise || 50);
-            buffer.push(FC.MZTC_CONFIG.temporal_denoise || 50);
+            buffer.push(FC.MZTC_CONFIG.digital_enhancement);
+            buffer.push(FC.MZTC_CONFIG.spatial_denoise);
+            buffer.push(FC.MZTC_CONFIG.temporal_denoise);
             buffer.push(FC.MZTC_CONFIG.brightness);
             buffer.push(FC.MZTC_CONFIG.contrast);
             buffer.push(FC.MZTC_CONFIG.zoom_level);
-            buffer.push(FC.MZTC_CONFIG.mirror_mode || 0);
-            buffer.push(FC.MZTC_CONFIG.crosshair_enabled || 0);
-            buffer.push(FC.MZTC_CONFIG.temperature_alerts);
-            // Temperatures are sent as float32
-            var highTempBytes = new ArrayBuffer(4);
-            var highTempView = new DataView(highTempBytes);
-            highTempView.setFloat32(0, FC.MZTC_CONFIG.alert_high_temp, true);
-            for (var i = 0; i < 4; i++) {
-                buffer.push(highTempView.getUint8(i));
-            }
-            
-            var lowTempBytes = new ArrayBuffer(4);
-            var lowTempView = new DataView(lowTempBytes);
-            lowTempView.setFloat32(0, FC.MZTC_CONFIG.alert_low_temp, true);
-            for (var i = 0; i < 4; i++) {
-                buffer.push(lowTempView.getUint8(i));
-            }
-            
+            buffer.push(FC.MZTC_CONFIG.mirror_mode);
             buffer.push(FC.MZTC_CONFIG.ffc_interval);
-            buffer.push(FC.MZTC_CONFIG.bad_pixel_removal || 1);
-            buffer.push(FC.MZTC_CONFIG.vignetting_correction || 1);
-            // Do not send channel fields - they're not in msp_mztc_config_t
-                break;
+            break;
 
             default:
                 return false;
