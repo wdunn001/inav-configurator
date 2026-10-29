@@ -2580,6 +2580,12 @@
     "adjustmentsFunction60": {
         "message": "Fixed Wing Alt Control Response Adjustment"
     },
+    "adjustmentsFunction61": {
+        "message": "Thermal Camera Zoom Adjustment"
+    },
+    "adjustmentsFunction62": {
+        "message": "Thermal Camera Palette Adjustment"
+    },
     "adjustmentsSave": {
         "message": "Save"
     },
